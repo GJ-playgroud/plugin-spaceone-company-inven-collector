@@ -3,8 +3,8 @@ name: "[Dispatch] Dev Release"
 on:
   workflow_dispatch:
 
-env:
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_TEST }}
+# env:
+#   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_TEST }}
 
 jobs:
   versioning:
