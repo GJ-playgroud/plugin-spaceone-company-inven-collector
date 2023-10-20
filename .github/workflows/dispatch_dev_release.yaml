@@ -59,6 +59,7 @@ jobs:
           tags: ${{ secrets.ECR_REPO }}:${{ env.VERSION }}
 
   notification:
+    if: ${{ env.SLACK_WEBHOOK_URL }}
     runs-on: ubuntu-latest
     needs: docker
     steps:
