@@ -46,6 +46,8 @@ jobs:
       - name: update version file # That is used where the master_push actions
         run: |
           echo ${{ env.VERSION }} > src/VERSION
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git add .
           git commit -m "[CI/CD] release version ${{ env.VERSION }}"
       - name: push changes
