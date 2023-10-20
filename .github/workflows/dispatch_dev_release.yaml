@@ -60,7 +60,6 @@ jobs:
 
 
   scan:
-    if:  ${{ secrets.SLACK_WEBHOOK_URL != '' }}
     needs: [versioning, docker]
     runs-on: ubuntu-20.04
     env:
