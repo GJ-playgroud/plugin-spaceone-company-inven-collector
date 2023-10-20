@@ -2,9 +2,17 @@ name: "[Dispatch] Dev Release"
 
 on:
   workflow_dispatch:
+      inputs:
+        container_arch:
+          type: choice
+          description: 'choose container architecture'
+          default: linux/amd64,linux/arm64
+          options:
+          - "linux/amd64"
+          - "linux/amd64,linux/arm64"
 
 env:
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_TEST_EMPTY }}
+  ARCH: ${{ github.event.inputs.container_arch }}
 
 jobs:
   versioning:
@@ -12,7 +20,10 @@ jobs:
     outputs:
       version: ${{ steps.versioning.outputs.VERSION }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.USER_TOKEN }}
       - name: get current date
         run: |
           sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
@@ -21,13 +32,6 @@ jobs:
         id: versioning
         run: |
           echo "VERSION=$(cat src/VERSION).${{ env.TIME }}" >> $GITHUB_OUTPUT
-      - name: Notice when job fails
-        if: failure()
-        uses: 8398a7/action-slack@v3.2.0
-        with:
-          status: ${{job.status}}
-          fields: repo,workflow,job
-          author_name: Github Action Slack
 
   docker:
     runs-on: ubuntu-latest
@@ -35,7 +39,10 @@ jobs:
     env:
       VERSION: ${{ needs.versioning.outputs.version }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.USER_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -55,17 +62,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          platforms: ${{ env.ARCH }}
           push: true
-          tags: ${{ secrets.ECR_REPO }}:${{ env.VERSION }}
-
-  notification:
-    runs-on: ubuntu-latest
-    needs: docker
-    steps:
-      - name: Slack
-        if: always()
-        uses: 8398a7/action-slack@v3.2.0
-        with:
-          status: ${{job.status}}
-          fields: repo,message,commit,author,action,ref,workflow,job
-          author_name: Github Action Slack
+          tags: ${{ secrets.DEV_ECR_REPO }}:${{ env.VERSION }}
