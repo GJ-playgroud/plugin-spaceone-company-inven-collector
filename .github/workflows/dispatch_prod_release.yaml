@@ -40,7 +40,8 @@ jobs:
     needs: condition_check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
       - name: update version file # That is used where the master_push actions
