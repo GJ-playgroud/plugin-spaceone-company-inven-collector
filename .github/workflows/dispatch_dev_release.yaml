@@ -51,12 +51,15 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push (Dev Private ECR)
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.ECR_REPO }}:${{ env.VERSION }}
+      - name: Debugging
+        run: echo ${{ env.VERSION }}
+
+      # - name: Build and push (Dev Private ECR)
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: ${{ secrets.ECR_REPO }}:${{ env.VERSION }}
 
 
   # scan:
