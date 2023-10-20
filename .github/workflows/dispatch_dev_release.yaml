@@ -20,7 +20,7 @@ jobs:
       - name: set version with current date
         id: versioning
         run: |
-          echo "VERSION=$(cat src/VERSION | cut -c 2-).${{ env.TIME }}" >> $GITHUB_OUTPUT
+          echo "VERSION=$(cat src/VERSION).${{ env.TIME }}" >> $GITHUB_OUTPUT
       - name: Notice when job fails
         if: failure()
         uses: 8398a7/action-slack@v3.2.0
@@ -51,15 +51,12 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Debugging
-        run: echo ${{ env.VERSION }}
-
-      # - name: Build and push (Dev Private ECR)
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     context: .
-      #     push: true
-      #     tags: ${{ secrets.ECR_REPO }}:${{ env.VERSION }}
+      - name: Build and push (Dev Private ECR)
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.ECR_REPO }}:${{ env.VERSION }}
 
 
   # scan:
