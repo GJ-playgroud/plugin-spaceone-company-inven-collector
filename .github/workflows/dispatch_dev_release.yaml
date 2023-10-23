@@ -31,9 +31,7 @@ jobs:
       - name: set version with current date
         id: versioning
         run: |
-          echo "VERSION=$(cat src/VERSION | cut -c 2-).${{ env.TIME }}" >> $GITHUB_OUTPUT
-          echo cat src/VERSION | cut -c 2-
-          echo cat src/VERSION
+          echo "VERSION=$(cat src/VERSION).${{ env.TIME }}" >> $GITHUB_OUTPUT
 
   docker:
     runs-on: ubuntu-latest
