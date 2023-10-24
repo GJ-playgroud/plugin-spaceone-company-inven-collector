@@ -67,3 +67,32 @@ jobs:
           push: true
           tags: ${{ secrets.DEV_ECR_REPO }}:${{ env.VERSION }}
           provenance: false
+
+  scan:
+    needs: [versioning, docker]
+    runs-on: ubuntu-20.04
+    env:
+      VERSION: ${{ needs.versioning.outputs.version }}
+    steps:
+      - name: Run Trivy vulnerability scanner
+        id: trivy-scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: pyengine/${{ github.event.repository.name }}:${{ env.VERSION }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Count vulnerabilities
+        id: vulnerabilities
+        run: |
+          count=$(jq '.runs[].results[].ruleId' ./trivy-results.sarif | wc -c)
+          echo "result_count=$count" >> $GITHUB_OUTPUT
+          echo "$count"
