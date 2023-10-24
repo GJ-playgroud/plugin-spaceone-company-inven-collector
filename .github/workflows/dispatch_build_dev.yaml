@@ -28,3 +28,14 @@ jobs:
           status: ${{job.status}}
           fields: repo,workflow,job
           author_name: Github Action Slack
+  
+  docker:
+      needs: versioning
+      runs-on: ubuntu-latest
+      env:
+        VERSION: ${{ needs.versioning.outputs.version }}
+      steps:
+        - name: Check
+          run: |
+            echo "${{ env.VERSION }}"
+  
